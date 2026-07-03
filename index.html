@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>House Notes — a guide for friends staying over</title>
+<style>
+  :root{
+    --ink:#22364A;
+    --paper:#F4F6F5;
+    --card:#FFFFFF;
+    --delft:#3E5F8A;
+    --delft-dark:#2E4A6E;
+    --marigold:#E0A138;
+    --line:#D8DFE3;
+    --muted:#5F6E7A;
+    --soft:#EDF1F3;
+    --radius:10px;
+    --serif:"Charter","Bitstream Charter","Sitka Text",Cambria,Georgia,serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--sans);
+    background:var(--paper);
+    color:var(--ink);
+    font-size:15px;
+    line-height:1.5;
+  }
+  /* ---------- Header ---------- */
+  header.app{
+    background:var(--ink);
+    color:#F5F7F9;
+    padding:14px 20px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:12px 20px;
+  }
+  header.app h1{
+    font-family:var(--serif);
+    font-size:22px;
+    font-weight:600;
+    margin:0;
+    letter-spacing:.01em;
+  }
+  header.app h1 em{color:var(--marigold);font-style:italic}
+  header.app .tagline{
+    font-size:13px;
+    color:#B9C6D0;
+    margin-right:auto;
+  }
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px}
+  button{
+    font-family:var(--sans);
+    font-size:13.5px;
+    border-radius:8px;
+    border:1px solid transparent;
+    padding:8px 14px;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  button:focus-visible{outline:3px solid var(--marigold);outline-offset:2px}
+  .btn-ghost{background:transparent;color:#DCE5EC;border-color:#4A607A}
+  .btn-ghost:hover{background:#31465E}
+  .btn-primary{background:var(--marigold);color:#2C2313;font-weight:600}
+  .btn-primary:hover{background:#EBB157}
+  .btn-quiet{background:var(--soft);color:var(--ink);border-color:var(--line)}
+  .btn-quiet:hover{background:#E2E9ED}
+  .btn-danger{background:transparent;color:#A33B2E;border-color:#E0C4BF}
+  .btn-danger:hover{background:#F7ECEA}
+
+  /* ---------- Layout ---------- */
+  .workspace{
+    display:grid;
+    grid-template-columns:minmax(360px,540px) 1fr;
+    gap:0;
+    min-height:calc(100vh - 60px);
+  }
+  .form-pane{
+    padding:20px 22px 80px;
+    overflow-y:auto;
+    max-height:calc(100vh - 60px);
+  }
+  .preview-pane{
+    border-left:1px solid var(--line);
+    background:#DDE3E7;
+    padding:18px;
+    position:sticky;
+    top:0;
+    max-height:calc(100vh - 60px);
+    display:flex;
+    flex-direction:column;
+  }
+  .preview-label{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 10px 4px;
+  }
+  #preview{
+    flex:1;
+    width:100%;
+    border:none;
+    border-radius:6px;
+    background:#fff;
+    box-shadow:0 2px 14px rgba(34,54,74,.18);
+  }
+  @media (max-width: 980px){
+    .workspace{grid-template-columns:1fr}
+    .preview-pane{display:none}
+    .preview-pane.mobile-show{display:flex;position:fixed;inset:0;z-index:50;max-height:none;padding-top:56px}
+    .mobile-preview-toggle{display:inline-block !important}
+  }
+  .mobile-preview-toggle{display:none}
+  .preview-close{
+    position:absolute;top:10px;right:14px;
+  }
+  body.dragging::after{
+    content:"Drop a saved guide or progress file to load it";
+    position:fixed;inset:0;z-index:100;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(34,54,74,.85);color:#fff;
+    font-family:var(--serif);font-size:24px;
+  }
+
+  /* ---------- Form sections ---------- */
+  .intro-note{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--marigold);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:18px;
+    font-size:14px;
+    color:#40525F;
+  }
+  details.section{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-bottom:12px;
+    overflow:hidden;
+  }
+  details.section[open]{border-color:#B9C7D2}
+  details.section summary{
+    list-style:none;
+    cursor:pointer;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    user-select:none;
+  }
+  details.section summary::-webkit-details-marker{display:none}
+  details.section summary:focus-visible{outline:3px solid var(--marigold);outline-offset:-3px}
+  .sec-title{
+    font-family:var(--serif);
+    font-size:17px;
+    font-weight:600;
+  }
+  .sec-hint{font-size:12.5px;color:var(--muted);margin-left:auto;text-align:right}
+  .chev{
+    width:9px;height:9px;
+    border-right:2px solid var(--delft);
+    border-bottom:2px solid var(--delft);
+    transform:rotate(-45deg);
+    transition:transform .15s ease;
+    flex:none;
+  }
+  details[open] .chev{transform:rotate(45deg)}
+  .sec-body{padding:2px 16px 18px;border-top:1px dashed var(--line)}
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:#3C4E5C;
+    margin:14px 0 4px;
+  }
+  label .opt{font-weight:400;color:var(--muted)}
+  input[type=text], textarea, select{
+    width:100%;
+    font-family:var(--sans);
+    font-size:14px;
+    color:var(--ink);
+    background:#FBFCFC;
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:9px 11px;
+  }
+  input[type=text]:focus, textarea:focus, select:focus{
+    outline:none;
+    border-color:var(--delft);
+    box-shadow:0 0 0 3px rgba(62,95,138,.15);
+  }
+  textarea{min-height:74px;resize:vertical;line-height:1.5}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+  @media (max-width:560px){.two-col{grid-template-columns:1fr}}
+  .row-list{margin-top:6px}
+  .row-card{
+    background:var(--soft);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:4px 14px 14px;
+    margin-top:12px;
+    position:relative;
+  }
+  .row-card .remove{
+    position:absolute;
+    top:10px;right:10px;
+    padding:3px 9px;
+    font-size:12px;
+  }
+  .add-row{margin-top:12px}
+  .helper{font-size:12.5px;color:var(--muted);margin-top:4px}
+
+  /* ---------- Photos ---------- */
+  .photo-widget{margin-top:10px}
+  .photo-widget .thumbs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+  .thumb{
+    width:150px;background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:6px;position:relative;
+  }
+  .thumb img{width:100%;height:92px;object-fit:cover;border-radius:5px;display:block}
+  .thumb input{margin-top:6px;font-size:12px;padding:5px 7px}
+  .thumb .thumb-rm{
+    position:absolute;top:2px;right:2px;padding:0 8px;font-size:14px;line-height:1.5;
+    background:#fff;
+  }
+  .btn-photo{font-size:12.5px;padding:6px 11px}
+
+  /* ---------- Nearby finder ---------- */
+  .nearby-box{
+    background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:12px 14px;margin-top:12px;
+  }
+  .nearby-msg{font-size:13px;color:var(--muted);margin:6px 0}
+  .nearby-group{margin-top:10px}
+  .nearby-group h5{
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--delft);margin:8px 0 4px;
+  }
+  .nearby-item{
+    display:flex;align-items:baseline;gap:8px;
+    font-size:13.5px;padding:3px 0;
+  }
+  .nearby-item input{width:auto}
+  .nearby-item .dist{color:var(--muted);font-size:12px;margin-left:auto;white-space:nowrap}
+  .nearby-actions{margin-top:10px;display:flex;gap:8px}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important}
+  }
+</style>
+</head>
+<body>
+
+<header class="app">
+  <h1>House <em>Notes</em></h1>
+  <span class="tagline">A warm guide for friends minding your home — not a rulebook.</span>
+  <div class="toolbar">
+    <button class="btn-ghost mobile-preview-toggle" onclick="togglePreview(true)">Preview</button>
+    <button class="btn-ghost" onclick="loadExample()">See an example</button>
+    <button class="btn-ghost" onclick="newStay()">New stay</button>
+    <button class="btn-ghost" onclick="saveProgress()">Save progress</button>
+    <button class="btn-ghost" onclick="document.getElementById('loadFile').click()">Load</button>
+    <input type="file" id="loadFile" accept=".json,.html,application/json,text/html" hidden onchange="loadFromInput(event)">
+    <button class="btn-quiet" onclick="printFridgeCard()">Print fridge card</button>
+    <button class="btn-quiet" onclick="printGuide()">Print / PDF</button>
+    <button class="btn-primary" onclick="downloadGuide()">Download guide (HTML)</button>
+  </div>
+</header>
+
+<div class="workspace">
+  <div class="form-pane">
+    <p class="intro-note">
+      Fill in whatever fits your house and skip the rest — empty sections simply won't appear in the guide.
+      <strong>The downloaded guide doubles as your saved file:</strong> next time, drop it back onto this page
+      (or use <strong>Load</strong>), press <strong>New stay</strong> to clear the guest-specific bits, and
+      you're nearly done. Add photos where a picture beats a paragraph, and use
+      <strong>Find places near the house</strong> under Local tips to pick recommendations from a real map
+      of your neighbourhood.
+    </p>
+
+    <details class="section" open>
+      <summary><span class="chev"></span><span class="sec-title">The basics</span><span class="sec-hint">who, where, when</span></summary>
+      <div class="sec-body">
+        <div class="two-col">
+          <div><label for="f_hosts">Your name(s)</label><input type="text" id="f_hosts" placeholder="Sam &amp; Alex"></div>
+          <div><label for="f_guest">Who's staying <span class="opt">(optional)</span></label><input type="text" id="f_guest" placeholder="Robin"></div>
+        </div>
+        <div class="two-col">
+          <div><label for="f_address">Address</label><input type="text" id="f_address" placeholder="Herengracht 12, Leiden"></div>
+          <div><label for="f_town">Town / city <span class="opt">(used for map links)</span></label><input type="text" id="f_town" placeholder="Leiden"></div>
+        </div>
+        <label for="f_dates">Dates you're away <span class="opt">(optional)</span></label>
+        <input type="text" id="f_dates" placeholder="12–26 August">
+        <label for="f_reach">Best way to reach you while you're away</label>
+        <input type="text" id="f_reach" placeholder="WhatsApp works everywhere we'll be: +31 6 …">
+      </div>
+    </details>
+
+    <details class="section" open>
+      <summary><span class="chev"></span><span class="sec-title">Welcome note</span><span class="sec-hint">make it yours</span></summary>
+      <div class="sec-body">
+        <label for="f_welcome">A few personal lines to open the guide</label>
+        <textarea id="f_welcome" placeholder="So glad you're staying! Please treat the place as your own — eat anything in the fridge, use the good coffee, and don't worry if the cat ignores you for the first day, she does that to everyone."></textarea>
+        <p class="helper">This sets the tone for the whole guide. Warm beats thorough.</p>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary><span class="chev"></span><span class="sec-title">Getting in &amp; keys</span><span class="sec-hint">locks, alarm, quirks</span></summary>
+      <div class="sec-body">
+        <label for="f_keys">Keys &amp; locks</label>
+        <textarea id="f_keys" placeholder="The silver key is the front door — lift the handle up before turning or it won't lock. The round key opens the bike shed."></textarea>
+        <label for="f_alarm">Alarm / entry codes <span class="opt">(optional)</span></label>
+        <textarea id="f_alarm" placeholder="No alarm, but the hallway light switch is hidden behind the coat rack."></textarea>
+        <div class="photo-block" data-store="keys" data-label="Add a photo (the tricky lock, which key is which…)"></div>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary><span class="chev"></span><span class="sec-title">Wifi &amp; essentials</span><span class="sec-hint">the first things anyone asks</span></summary>
+      <div class="sec-body">
+        <div class="two-col">
+          <div><label for="f_wifiname">Wifi network</label><input type="text" id="f_wifiname" placeholder="Casa12"></div>
+          <div><label for="f_wifipass">Wifi password</label><input type="text" id="f_wifipass" placeholder="correct-horse-battery"></div>
+        </div>
+        <p class="helper">The guide gets a scannable wifi QR code automatically — guests point their camera at it and they're online.</p>
+        <label for="f_heating">Heating &amp; hot water</label>
+        <textarea id="f_heating" placeholder="Thermostat is in the hall — it's set to a schedule, but nudge it up if you're cold. Shower takes ~30 seconds to warm up."></textarea>
+        <label for="f_appliances">Appliances worth explaining</label>
+        <textarea id="f_appliances" placeholder="The induction hob needs the pan dead-centre or it sulks. Dishwasher tablets under the sink. The TV remote: press the round button twice."></textarea>
+        <div class="photo-block" data-store="essentials" data-label="Add a photo (the thermostat, the confusing remote…)"></div>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary><span class="chev"></span><span class="sec-title">Pets</span><span class="sec-hint">add one per animal</span></summary>
+      <div class="sec-body">
+        <div class="row-list" id="petList"></div>
+        <button class="btn-quiet add-row" onclick="addPet()">+ Add a pet</button>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary><span class="chev"></span><span class="sec-title">House rhythms</span><span class="sec-hint">bins, plants, quirks</span></summary>
+      <div class="sec-body">
+        <label for="f_bins">Bins &amp; recycling</label>
+        <textarea id="f_bins" placeholder="Green bin (organic) goes out Monday evening; paper every other Thursday. The containers live by the side gate — neighbours usually put theirs out first, so just follow the crowd."></textarea>
+        <label for="f_plants">Plants &amp; garden <span class="opt">(optional)</span></label>
+        <textarea id="f_plants" placeholder="The big monstera gets a glass of water on Sundays. Everything on the balcony can survive neglect."></textarea>
+        <label for="f_quirks">Things that look broken but aren't</label>
+        <textarea id="f_quirks" placeholder="The bathroom tap squeaks — it's fine. The fridge hums loudly at night; give it a gentle shove and it stops."></textarea>
+        <label for="f_other">Anything else about the house</label>
+        <textarea id="f_other" placeholder="Spare bedding in the landing cupboard. Help yourself to the vegetable patch."></textarea>
+        <div class="photo-block" data-store="house" data-label="Add a photo (where the bins go, the plant that needs water…)"></div>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary><span class="chev"></span><span class="sec-title">Local tips</span><span class="sec-hint">eat, drink, wander</span></summary>
+      <div class="sec-body">
+        <p class="helper">Each tip gets automatic map links in the guide (Google Maps + OpenStreetMap). Or let the map do the remembering:</p>
+        <div class="nearby-box">
+          <button class="btn-quiet" onclick="findNearby()">Find places near the house</button>
+          <span class="helper" style="display:inline;margin-left:6px">uses your address &amp; OpenStreetMap — needs internet</span>
+          <div id="nearbyMsg" class="nearby-msg"></div>
+          <div id="nearbyResults"></div>
+        </div>
+        <div class="row-list" id="tipList"></div>
+        <button class="btn-quiet add-row" onclick="addTip()">+ Add a tip</button>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary><span class="chev"></span><span class="sec-title">Useful people &amp; numbers</span><span class="sec-hint">neighbours, vet, plumber</span></summary>
+      <div class="sec-body">
+        <div class="row-list" id="contactList"></div>
+        <button class="btn-quiet add-row" onclick="addContact()">+ Add a contact</button>
+      </div>
+    </details>
+
+    <details class="section">
+      <summary><span class="chev"></span><span class="sec-title">Extra sections</span><span class="sec-hint">anything the house needs</span></summary>
+      <div class="sec-body">
+        <p class="helper">Every house is different — add whatever doesn't fit above (the sourdough starter, the moody boiler, the borrowable bikes…).</p>
+        <div class="row-list" id="customList"></div>
+        <button class="btn-quiet add-row" onclick="addCustom()">+ Add a section</button>
+      </div>
+    </details>
+  </div>
+
+  <div class="preview-pane" id="previewPane">
+    <button class="btn-quiet preview-close mobile-preview-toggle" onclick="togglePreview(false)">Close</button>
+    <p class="preview-label">Live preview — this is the guide your guest receives</p>
+    <iframe id="preview" title="Guide preview"></iframe>
+  </div>
+</div>
+
+<script>
+/* qrcode-generator v2.0.4 (c) Kazuhiko Arase, MIT License - https://github.com/kazuhikoarase/qrcode-generator */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(o*r,n*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
+</script>
+<script>
+"use strict";
+
+/* ---------------- tiny helpers ---------------- */
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function paras(s){
+  const t = String(s || "").trim();
+  if(!t) return "";
+  return t.split(/\n{2,}/).map(function(p){
+    return "<p>" + esc(p).replace(/\n/g,"<br>") + "</p>";
+  }).join("");
+}
+function firstLine(s){
+  var t = String(s || "").trim();
+  if(!t) return "";
+  var line = t.split(/\n/)[0];
+  var m = line.match(/^.*?[.!?](?=\s|$)/);
+  if(m) line = m[0];
+  if(line.length > 140) line = line.slice(0, 137) + "…";
+  return line.trim();
+}
+function el(id){ return document.getElementById(id); }
+function val(id){ return el(id) ? el(id).value.trim() : ""; }
+
+/* ---------------- photos ---------------- */
+var photoStore = { keys: [], essentials: [], house: [] };
+
+function shrinkImage(file, cb){
+  var img = new Image();
+  var url = URL.createObjectURL(file);
+  img.onload = function(){
+    var max = 1200, w = img.width, h = img.height;
+    var scale = Math.min(1, max / Math.max(w, h));
+    var cv = document.createElement("canvas");
+    cv.width = Math.max(1, Math.round(w * scale));
+    cv.height = Math.max(1, Math.round(h * scale));
+    cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+    URL.revokeObjectURL(url);
+    cb(cv.toDataURL("image/jpeg", 0.8));
+  };
+  img.onerror = function(){
+    URL.revokeObjectURL(url);
+    alert("That image couldn't be read — try a JPG or PNG.");
+  };
+  img.src = url;
+}
+
+function makePhotoWidget(arr, labelText){
+  var wrap = document.createElement("div");
+  wrap.className = "photo-widget";
+  var thumbs = document.createElement("div");
+  thumbs.className = "thumbs";
+  wrap.appendChild(thumbs);
+
+  var btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "btn-quiet btn-photo";
+  btn.textContent = "📷 " + (labelText || "Add a photo");
+  var file = document.createElement("input");
+  file.type = "file";
+  file.accept = "image/*";
+  file.hidden = true;
+  btn.addEventListener("click", function(){ file.click(); });
+  file.addEventListener("change", function(){
+    var f = file.files[0];
+    if(!f) return;
+    shrinkImage(f, function(dataUrl){
+      arr.push({ src: dataUrl, caption: "" });
+      renderThumbs(thumbs, arr);
+      refresh();
+    });
+    file.value = "";
+  });
+  wrap.appendChild(btn);
+  wrap.appendChild(file);
+  renderThumbs(thumbs, arr);
+  wrap._thumbs = thumbs;
+  wrap._arr = arr;
+  return wrap;
+}
+
+function renderThumbs(container, arr){
+  container.innerHTML = "";
+  arr.forEach(function(p, i){
+    var t = document.createElement("div");
+    t.className = "thumb";
+    var img = document.createElement("img");
+    img.src = p.src;
+    img.alt = p.caption || "photo";
+    var cap = document.createElement("input");
+    cap.type = "text";
+    cap.placeholder = "Caption…";
+    cap.value = p.caption || "";
+    cap.addEventListener("input", function(){ p.caption = cap.value; refresh(); });
+    var rm = document.createElement("button");
+    rm.type = "button";
+    rm.className = "btn-danger thumb-rm";
+    rm.setAttribute("aria-label", "Remove photo");
+    rm.textContent = "×";
+    rm.addEventListener("click", function(){
+      arr.splice(i, 1);
+      renderThumbs(container, arr);
+      refresh();
+    });
+    t.appendChild(img); t.appendChild(cap); t.appendChild(rm);
+    container.appendChild(t);
+  });
+}
+
+function initFixedPhotoBlocks(){
+  document.querySelectorAll(".photo-block").forEach(function(block){
+    block.innerHTML = "";
+    var key = block.getAttribute("data-store");
+    block.appendChild(makePhotoWidget(photoStore[key], block.getAttribute("data-label")));
+  });
+}
+
+/* ---------------- dynamic rows ---------------- */
+var TIP_CATS = ["Eat","Drink","Coffee & cake","Fun & culture","Walks & nature","Shops & practical"];
+
+function rowShell(removeLabel){
+  var card = document.createElement("div");
+  card.className = "row-card";
+  var btn = document.createElement("button");
+  btn.className = "btn-danger remove";
+  btn.type = "button";
+  btn.textContent = removeLabel || "Remove";
+  btn.addEventListener("click", function(){ card.remove(); refresh(); });
+  card.appendChild(btn);
+  return card;
+}
+function field(card, labelText, kind, cls, placeholder, value){
+  var lab = document.createElement("label");
+  lab.textContent = labelText;
+  card.appendChild(lab);
+  var input;
+  if(kind === "textarea"){ input = document.createElement("textarea"); }
+  else if(kind === "select"){
+    input = document.createElement("select");
+    TIP_CATS.forEach(function(c){
+      var o = document.createElement("option");
+      o.value = c; o.textContent = c;
+      input.appendChild(o);
+    });
+  } else {
+    input = document.createElement("input"); input.type = "text";
+  }
+  input.className = cls;
+  if(placeholder) input.placeholder = placeholder;
+  if(value) input.value = value;
+  input.addEventListener("input", refresh);
+  card.appendChild(input);
+  return input;
+}
+
+function addPet(data){
+  data = data || {};
+  var card = rowShell();
+  card._photos = (data.photos || []).slice();
+  field(card, "Name & what they are", "text", "pet-name", "Mabel — elderly tabby cat", data.name);
+  field(card, "Food & feeding times", "textarea", "pet-food", "Half a pouch morning and evening (cupboard left of the fridge). Dry food bowl topped up whenever.", data.food);
+  field(card, "Litter / walks / routine", "textarea", "pet-routine", "Litter tray in the utility room — scoop daily if you can, fresh litter under the sink.", data.routine);
+  field(card, "Personality & quirks", "textarea", "pet-personality", "Aloof for a day, then she'll sleep on your feet. Hides under the bed during thunderstorms — leave her be.", data.personality);
+  field(card, "Vet & health notes", "textarea", "pet-vet", "Vet: Dierenkliniek Centrum, 071-123 4567. She's healthy; if she skips two meals in a row, call us.", data.vet);
+  card.appendChild(makePhotoWidget(card._photos, "Add a photo (them, the food cupboard…)"));
+  el("petList").appendChild(card);
+  refresh();
+}
+function addTip(data){
+  data = data || {};
+  var card = rowShell();
+  var sel = field(card, "Category", "select", "tip-cat", null, null);
+  if(data.cat) sel.value = data.cat;
+  sel.addEventListener("change", refresh);
+  field(card, "Place name", "text", "tip-name", "Café de Bonte Koe", data.name);
+  field(card, "Why you love it / what to order", "textarea", "tip-why", "Our favourite brown café — get the local beer and sit by the window.", data.why);
+  field(card, "Map search override (optional)", "text", "tip-query", "Leave blank to use the name + town", data.query);
+  el("tipList").appendChild(card);
+  refresh();
+  return card;
+}
+function addContact(data){
+  data = data || {};
+  var card = rowShell();
+  field(card, "Who", "text", "c-who", "Marijke next door (no. 14)", data.who);
+  field(card, "Number / how to reach", "text", "c-num", "06 1234 5678", data.num);
+  field(card, "When they're useful", "text", "c-note", "Has a spare key; happy to help with anything house-related", data.note);
+  el("contactList").appendChild(card);
+  refresh();
+}
+function addCustom(data){
+  data = data || {};
+  var card = rowShell();
+  card._photos = (data.photos || []).slice();
+  field(card, "Section title", "text", "x-title", "The sourdough starter", data.title);
+  field(card, "What to know", "textarea", "x-body", "Lives in the fridge, needs nothing while we're away. If it bubbles over, that's a good sign.", data.body);
+  card.appendChild(makePhotoWidget(card._photos, "Add a photo"));
+  el("customList").appendChild(card);
+  refresh();
+}
+
+/* ---------------- collect state ---------------- */
+function collect(){
+  var pets = [].map.call(document.querySelectorAll("#petList .row-card"), function(c){
+    return {
+      name: c.querySelector(".pet-name").value.trim(),
+      food: c.querySelector(".pet-food").value.trim(),
+      routine: c.querySelector(".pet-routine").value.trim(),
+      personality: c.querySelector(".pet-personality").value.trim(),
+      vet: c.querySelector(".pet-vet").value.trim(),
+      photos: c._photos || []
+    };
+  }).filter(function(p){ return p.name || p.food || p.routine || p.personality || p.vet || p.photos.length; });
+
+  var tips = [].map.call(document.querySelectorAll("#tipList .row-card"), function(c){
+    return {
+      cat: c.querySelector(".tip-cat").value,
+      name: c.querySelector(".tip-name").value.trim(),
+      why: c.querySelector(".tip-why").value.trim(),
+      query: c.querySelector(".tip-query").value.trim()
+    };
+  }).filter(function(t){ return t.name; });
+
+  var contacts = [].map.call(document.querySelectorAll("#contactList .row-card"), function(c){
+    return {
+      who: c.querySelector(".c-who").value.trim(),
+      num: c.querySelector(".c-num").value.trim(),
+      note: c.querySelector(".c-note").value.trim()
+    };
+  }).filter(function(c){ return c.who || c.num; });
+
+  var custom = [].map.call(document.querySelectorAll("#customList .row-card"), function(c){
+    return {
+      title: c.querySelector(".x-title").value.trim(),
+      body: c.querySelector(".x-body").value.trim(),
+      photos: c._photos || []
+    };
+  }).filter(function(c){ return c.title || c.body || c.photos.length; });
+
+  return {
+    hosts: val("f_hosts"), guest: val("f_guest"), address: val("f_address"),
+    town: val("f_town"), dates: val("f_dates"), reach: val("f_reach"),
+    welcome: val("f_welcome"),
+    keys: val("f_keys"), alarm: val("f_alarm"),
+    wifiname: val("f_wifiname"), wifipass: val("f_wifipass"),
+    heating: val("f_heating"), appliances: val("f_appliances"),
+    bins: val("f_bins"), plants: val("f_plants"), quirks: val("f_quirks"), other: val("f_other"),
+    photos: {
+      keys: photoStore.keys.slice(),
+      essentials: photoStore.essentials.slice(),
+      house: photoStore.house.slice()
+    },
+    pets: pets, tips: tips, contacts: contacts, custom: custom
+  };
+}
+
+/* ---------------- wifi QR ---------------- */
+function wifiEscape(s){ return String(s).replace(/([\\;,:"])/g, "\\$1"); }
+function wifiQRSvg(name, pass){
+  if(!name) return "";
+  try{
+    var payload = "WIFI:T:" + (pass ? "WPA" : "nopass") + ";S:" + wifiEscape(name) + ";" +
+      (pass ? "P:" + wifiEscape(pass) + ";" : "") + ";";
+    var qr = qrcode(0, "M");
+    qr.addData(payload);
+    qr.make();
+    return qr.createSvgTag({ cellSize: 3, margin: 0, scalable: true });
+  }catch(e){ return ""; }
+}
+
+/* ---------------- build the guide HTML ---------------- */
+function mapLinks(t, town){
+  var q = t.query || (t.name + (town ? ", " + town : ""));
+  var enc = encodeURIComponent(q);
+  return '<span class="maps">' +
+    '<a href="https://www.google.com/maps/search/?api=1&amp;query=' + enc + '" target="_blank" rel="noopener">Google Maps</a>' +
+    ' · <a href="https://www.openstreetmap.org/search?query=' + enc + '" target="_blank" rel="noopener">OpenStreetMap</a>' +
+    '</span>';
+}
+function section(title, inner){
+  if(!inner) return "";
+  return '<section><h2>' + esc(title) + '</h2>' + inner + '</section>';
+}
+function photoFigs(arr){
+  if(!arr || !arr.length) return "";
+  var h = '<div class="figs">';
+  arr.forEach(function(p){
+    h += '<figure><img src="' + esc(p.src) + '" alt="' + esc(p.caption || "photo") + '">' +
+      (p.caption ? '<figcaption>' + esc(p.caption) + '</figcaption>' : '') + '</figure>';
+  });
+  return h + '</div>';
+}
+function glanceItems(s){
+  var items = [];
+  if(s.wifiname) items.push(["Wifi", esc(s.wifiname) + (s.wifipass ? ' · <code>' + esc(s.wifipass) + '</code>' : "")]);
+  if(s.keys) items.push(["Keys", esc(firstLine(s.keys))]);
+  s.pets.forEach(function(p){
+    if(p.name && p.food) items.push([esc(firstLine(p.name).split("—")[0].trim()), esc(firstLine(p.food))]);
+  });
+  if(s.bins) items.push(["Bins", esc(firstLine(s.bins))]);
+  if(s.reach) items.push(["Reach us", esc(firstLine(s.reach))]);
+  return items;
+}
+
+function buildGuide(s){
+  var houseName = s.address ? s.address.split(",")[0] : "our place";
+  var title = "Your guide to " + houseName;
+  var hello = s.guest ? ("Dear " + esc(s.guest) + ",") : "Hello!";
+  var qrSvg = wifiQRSvg(s.wifiname, s.wifipass);
+
+  /* --- header block --- */
+  var meta = [];
+  if(s.dates) meta.push('<span><strong>When:</strong> ' + esc(s.dates) + '</span>');
+  if(s.address){
+    var addrEnc = encodeURIComponent(s.address);
+    meta.push('<span><strong>Where:</strong> ' + esc(s.address) +
+      ' — <a href="https://www.google.com/maps/search/?api=1&amp;query=' + addrEnc + '" target="_blank" rel="noopener">map</a></span>');
+  }
+  if(s.reach) meta.push('<span><strong>Reach us:</strong> ' + esc(s.reach) + '</span>');
+  var metaHtml = meta.length ? '<div class="meta">' + meta.join("") + '</div>' : "";
+
+  /* --- welcome --- */
+  var welcome = "";
+  if(s.welcome){
+    welcome = '<section class="welcome"><p class="hello">' + hello + '</p>' + paras(s.welcome) +
+      (s.hosts ? '<p class="signoff">— ' + esc(s.hosts) + '</p>' : "") + '</section>';
+  }
+
+  /* --- day one at a glance (auto) --- */
+  var gl = glanceItems(s);
+  var glance = "";
+  if(gl.length >= 2){
+    glance = '<section class="glance"><h2>Day one at a glance</h2><dl>';
+    gl.forEach(function(it){
+      glance += '<div><dt>' + it[0] + '</dt><dd>' + it[1] + '</dd></div>';
+    });
+    glance += '</dl></section>';
+  }
+
+  /* --- getting in --- */
+  var inBits = "";
+  if(s.keys) inBits += '<h3>Keys &amp; locks</h3>' + paras(s.keys);
+  if(s.alarm) inBits += '<h3>Codes &amp; getting around</h3>' + paras(s.alarm);
+  inBits += photoFigs(s.photos.keys);
+  if(!s.keys && !s.alarm && !s.photos.keys.length) inBits = "";
+  var gettingIn = section("Getting in", inBits);
+
+  /* --- essentials --- */
+  var essBits = "";
+  if(s.wifiname || s.wifipass){
+    essBits += '<div class="wifi-card">' +
+      '<div class="wifi-text"><span class="wifi-label">Wifi</span>' +
+      (s.wifiname ? '<span><strong>Network:</strong> ' + esc(s.wifiname) + '</span>' : "") +
+      (s.wifipass ? '<span><strong>Password:</strong> <code>' + esc(s.wifipass) + '</code></span>' : "") +
+      (qrSvg ? '<span class="wifi-scan">…or just scan with your phone camera →</span>' : "") +
+      '</div>' +
+      (qrSvg ? '<div class="wifi-qr">' + qrSvg + '</div>' : "") +
+      '</div>';
+  }
+  if(s.heating) essBits += '<h3>Heating &amp; hot water</h3>' + paras(s.heating);
+  if(s.appliances) essBits += '<h3>Appliances</h3>' + paras(s.appliances);
+  essBits += photoFigs(s.photos.essentials);
+  if(!s.wifiname && !s.wifipass && !s.heating && !s.appliances && !s.photos.essentials.length) essBits = "";
+  var essentials = section("Wifi & essentials", essBits);
+
+  /* --- pets --- */
+  var petBits = "";
+  s.pets.forEach(function(p){
+    petBits += '<div class="pet">';
+    if(p.name) petBits += '<h3>' + esc(p.name) + '</h3>';
+    if(p.food) petBits += '<h4>Food</h4>' + paras(p.food);
+    if(p.routine) petBits += '<h4>Routine</h4>' + paras(p.routine);
+    if(p.personality) petBits += '<h4>Personality</h4>' + paras(p.personality);
+    if(p.vet) petBits += '<h4>Vet &amp; health</h4>' + paras(p.vet);
+    petBits += photoFigs(p.photos);
+    petBits += '</div>';
+  });
+  var pets = section(s.pets.length > 1 ? "The animals" : "The animal in residence", petBits);
+
+  /* --- house rhythms --- */
+  var houseBits = "";
+  if(s.bins) houseBits += '<h3>Bins &amp; recycling</h3>' + paras(s.bins);
+  if(s.plants) houseBits += '<h3>Plants &amp; garden</h3>' + paras(s.plants);
+  if(s.quirks) houseBits += '<h3>Things that look broken but aren\u2019t</h3>' + paras(s.quirks);
+  if(s.other) houseBits += '<h3>Odds &amp; ends</h3>' + paras(s.other);
+  houseBits += photoFigs(s.photos.house);
+  if(!s.bins && !s.plants && !s.quirks && !s.other && !s.photos.house.length) houseBits = "";
+  var house = section("How the house works", houseBits);
+
+  /* --- tips grouped by category --- */
+  var tipBits = "";
+  TIP_CATS.forEach(function(cat){
+    var group = s.tips.filter(function(t){ return t.cat === cat; });
+    if(!group.length) return;
+    tipBits += '<h3>' + esc(cat) + '</h3><ul class="tips">';
+    group.forEach(function(t){
+      tipBits += '<li><span class="tip-name">' + esc(t.name) + '</span>' +
+        (t.why ? ' — ' + esc(t.why).replace(/\n/g,"<br>") : "") + ' ' + mapLinks(t, s.town) + '</li>';
+    });
+    tipBits += '</ul>';
+  });
+  var tips = section("Out and about" + (s.town ? " in " + esc(s.town) : ""), tipBits);
+
+  /* --- custom sections --- */
+  var customHtml = "";
+  s.custom.forEach(function(c){
+    customHtml += section(c.title || "A note", paras(c.body) + photoFigs(c.photos));
+  });
+
+  /* --- contacts --- */
+  var conBits = "";
+  if(s.contacts.length){
+    conBits = '<table class="contacts"><tbody>';
+    s.contacts.forEach(function(c){
+      conBits += '<tr><td class="c-who">' + esc(c.who) + '</td><td class="c-num">' + esc(c.num) + '</td><td class="c-note">' + esc(c.note) + '</td></tr>';
+    });
+    conBits += '</tbody></table>';
+  }
+  var contacts = section("Useful people & numbers", conBits);
+
+  var css = [
+    ':root{--ink:#26333D;--blue:#3E5F8A;--gold:#C98A1E;--paper:#FDFDFB;--line:#E3E0D8;--muted:#6C7680}',
+    '*{box-sizing:border-box}',
+    'body{margin:0;background:#EFEDE7;color:var(--ink);font-family:"Charter","Bitstream Charter","Sitka Text",Cambria,Georgia,serif;font-size:16.5px;line-height:1.62}',
+    '.page{max-width:720px;margin:0 auto;background:var(--paper);padding:52px 56px 64px;min-height:100vh}',
+    'header.guide{border-bottom:3px double var(--blue);padding-bottom:22px;margin-bottom:8px}',
+    '.eyebrow{font-family:system-ui,sans-serif;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 10px}',
+    'h1{font-size:34px;line-height:1.15;margin:0 0 14px;font-weight:600}',
+    '.meta{display:flex;flex-direction:column;gap:4px;font-family:system-ui,sans-serif;font-size:13.5px;color:var(--muted)}',
+    '.meta strong{color:var(--ink)}',
+    'section{margin-top:34px}',
+    'h2{font-size:22px;margin:0 0 10px;color:var(--blue);font-weight:600;border-bottom:1px solid var(--line);padding-bottom:6px}',
+    'h3{font-size:16px;margin:20px 0 4px;font-weight:700}',
+    'h4{font-family:system-ui,sans-serif;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px}',
+    'p{margin:6px 0}',
+    'a{color:var(--blue)}',
+    '.welcome{background:#F6F4EC;border-left:4px solid var(--gold);padding:18px 22px;margin-top:26px;font-style:italic}',
+    '.welcome .hello{font-weight:700;font-style:normal;margin-top:0}',
+    '.signoff{text-align:right;font-style:normal;font-weight:600}',
+    '.glance{background:#EEF2F6;border:1px solid #D5DEE8;border-radius:10px;padding:16px 20px 18px}',
+    '.glance h2{border:none;margin-bottom:4px;padding-bottom:0;font-size:18px}',
+    '.glance dl{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin:8px 0 0;font-family:system-ui,sans-serif;font-size:14px}',
+    '.glance dt{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:1px}',
+    '.glance dd{margin:0;line-height:1.45}',
+    '.glance code{background:#fff;border:1px solid #D5DEE8;border-radius:4px;padding:0 5px}',
+    '@media (max-width:560px){.glance dl{grid-template-columns:1fr}}',
+    '.wifi-card{display:flex;align-items:center;gap:20px;background:#EEF2F6;border:1px solid #D5DEE8;border-radius:8px;padding:14px 16px;font-family:system-ui,sans-serif;font-size:14.5px;margin:12px 0 4px}',
+    '.wifi-text{display:flex;flex-direction:column;gap:5px;flex:1}',
+    '.wifi-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);font-weight:700}',
+    '.wifi-scan{font-size:12.5px;color:var(--muted);font-style:italic}',
+    '.wifi-card code{background:#fff;border:1px solid #D5DEE8;border-radius:5px;padding:1px 7px;font-size:14px}',
+    '.wifi-qr{background:#fff;border:1px solid #D5DEE8;border-radius:8px;padding:8px;flex:none}',
+    '.wifi-qr svg{width:104px;height:104px;display:block}',
+    '.pet{margin-top:8px}',
+    '.pet + .pet{border-top:1px dashed var(--line);padding-top:10px;margin-top:22px}',
+    '.figs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}',
+    '.figs figure{margin:0}',
+    '.figs img{width:100%;border-radius:8px;display:block;border:1px solid var(--line)}',
+    '.figs figcaption{font-family:system-ui,sans-serif;font-size:12.5px;color:var(--muted);margin-top:5px}',
+    '@media (max-width:560px){.figs{grid-template-columns:1fr}}',
+    'ul.tips{list-style:none;padding:0;margin:6px 0 0}',
+    'ul.tips li{padding:7px 0;border-bottom:1px dotted var(--line)}',
+    '.tip-name{font-weight:700}',
+    '.maps{font-family:system-ui,sans-serif;font-size:12.5px;white-space:nowrap}',
+    'table.contacts{width:100%;border-collapse:collapse;font-size:15px;margin-top:8px}',
+    'table.contacts td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}',
+    '.c-who{font-weight:700;width:34%}.c-num{width:28%;font-family:system-ui,sans-serif;font-size:14px}.c-note{color:var(--muted);font-size:14.5px}',
+    'footer.guide{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-family:system-ui,sans-serif;font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}',
+    '.print-btn{font-family:system-ui,sans-serif;font-size:13px;background:var(--blue);color:#fff;border:none;border-radius:7px;padding:8px 14px;cursor:pointer}',
+    '@media (max-width:640px){.page{padding:30px 22px 48px}h1{font-size:27px}.wifi-card{flex-direction:column;align-items:flex-start}}',
+    '@media print{body{background:#fff;font-size:12.5pt}.page{max-width:none;padding:0;min-height:0}.print-btn{display:none}section{break-inside:avoid-page;margin-top:22px}a{color:var(--ink);text-decoration:none}.maps{display:none}header.guide{padding-bottom:14px}.figs img{max-height:220px;object-fit:cover}}'
+  ].join("\n");
+
+  var embedded = JSON.stringify(s).replace(/<\//g, "<\\/");
+
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+    '<title>' + esc(title) + '</title><style>' + css + '</style></head><body>' +
+    '<div class="page">' +
+    '<header class="guide"><p class="eyebrow">House notes' + (s.hosts ? ' · from ' + esc(s.hosts) : '') + '</p>' +
+    '<h1>' + esc(title) + '</h1>' + metaHtml + '</header>' +
+    welcome + glance + gettingIn + essentials + pets + house + tips + customHtml + contacts +
+    '<footer class="guide"><span>Made with love' + (s.hosts ? ' by ' + esc(s.hosts) : '') +
+    '. Have a wonderful stay.<br>Hosts: this file doubles as your saved progress — load it back into House Notes to edit it for the next stay.</span>' +
+    '<button class="print-btn" onclick="window.print()">Print this guide</button></footer>' +
+    '</div>' +
+    '<script type="application/json" id="house-notes-data">' + embedded + '<\/script>' +
+    '</body></html>';
+}
+
+/* ---------------- fridge card ---------------- */
+function buildFridgeCard(s){
+  var houseName = s.address ? s.address.split(",")[0] : "the house";
+  var qrSvg = wifiQRSvg(s.wifiname, s.wifipass);
+  var gl = glanceItems(s);
+  var items = "";
+  gl.forEach(function(it){
+    items += '<div class="item"><span class="k">' + it[0] + '</span><span class="v">' + it[1] + '</span></div>';
+  });
+  var firstContact = s.contacts.length ?
+    '<div class="item"><span class="k">' + esc(s.contacts[0].who) + '</span><span class="v">' + esc(s.contacts[0].num) +
+    (s.contacts[0].note ? ' · ' + esc(s.contacts[0].note) : '') + '</span></div>' : "";
+  var css = [
+    'body{margin:0;font-family:"Charter",Cambria,Georgia,serif;color:#26333D;background:#fff}',
+    '.card{max-width:600px;margin:24px auto;border:2px solid #3E5F8A;border-radius:12px;padding:26px 30px}',
+    'h1{font-size:23px;margin:0 0 2px}',
+    '.sub{font-family:system-ui,sans-serif;font-size:12.5px;color:#6C7680;margin:0 0 16px}',
+    '.grid{display:flex;gap:22px;align-items:flex-start}',
+    '.items{flex:1;display:flex;flex-direction:column;gap:11px}',
+    '.k{display:block;font-family:system-ui,sans-serif;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#3E5F8A;font-weight:700}',
+    '.v{font-size:15.5px;line-height:1.4}',
+    '.v code{font-family:system-ui,sans-serif;background:#EEF2F6;border:1px solid #D5DEE8;border-radius:4px;padding:0 5px;font-size:13.5px}',
+    '.qr{flex:none;text-align:center;font-family:system-ui,sans-serif;font-size:11px;color:#6C7680}',
+    '.qr svg{width:118px;height:118px;display:block;margin-bottom:4px}',
+    '@media print{.card{margin:0;border-width:1.5pt}body{-webkit-print-color-adjust:exact}}'
+  ].join("\n");
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Fridge card — ' + esc(houseName) + '</title>' +
+    '<style>' + css + '</style></head><body><div class="card">' +
+    '<h1>' + esc(houseName) + ' — the short version</h1>' +
+    '<p class="sub">' + (s.dates ? esc(s.dates) + ' · ' : '') + 'the full guide has everything else</p>' +
+    '<div class="grid"><div class="items">' + items + firstContact + '</div>' +
+    (qrSvg ? '<div class="qr">' + qrSvg + 'scan for wifi</div>' : '') +
+    '</div></div></body></html>';
+}
+
+/* ---------------- nearby places (OpenStreetMap) ---------------- */
+var OSM_CAT_MAP = [
+  [/^(cafe|ice_cream)$/, "amenity", "Coffee & cake"],
+  [/^(restaurant|fast_food|food_court)$/, "amenity", "Eat"],
+  [/^(pub|bar|biergarten)$/, "amenity", "Drink"],
+  [/^(museum|gallery|attraction|zoo)$/, "tourism", "Fun & culture"],
+  [/^(cinema|theatre|arts_centre)$/, "amenity", "Fun & culture"],
+  [/^(park|garden|nature_reserve)$/, "leisure", "Walks & nature"],
+  [/^(supermarket|bakery|deli|greengrocer|cheese|books)$/, "shop", "Shops & practical"],
+  [/^marketplace$/, "amenity", "Shops & practical"]
+];
+function osmCategory(tags){
+  for(var i = 0; i < OSM_CAT_MAP.length; i++){
+    var m = OSM_CAT_MAP[i];
+    if(tags[m[1]] && m[0].test(tags[m[1]])) return m[2];
+  }
+  return null;
+}
+function nearbyMsg(t){ el("nearbyMsg").textContent = t || ""; }
+
+function findNearby(){
+  var s = collect();
+  var q = s.address || s.town;
+  if(!q){
+    nearbyMsg("Add your address (or at least the town) under \u201cThe basics\u201d first.");
+    return;
+  }
+  if(s.address && s.town && s.address.toLowerCase().indexOf(s.town.toLowerCase()) === -1){
+    q = s.address + ", " + s.town;
+  }
+  el("nearbyResults").innerHTML = "";
+  nearbyMsg("Looking up the address\u2026");
+  fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + encodeURIComponent(q))
+    .then(function(r){ if(!r.ok) throw new Error("net"); return r.json(); })
+    .then(function(res){
+      if(!res.length) throw new Error("The address wasn't found on the map — try simplifying it (street + town).");
+      var lat = parseFloat(res[0].lat), lon = parseFloat(res[0].lon);
+      nearbyMsg("Finding places within about a 15-minute walk\u2026");
+      var around = "(around:1100," + lat + "," + lon + ")";
+      var query = "[out:json][timeout:25];(" +
+        'nwr' + around + '[amenity~"^(cafe|ice_cream|restaurant|fast_food|pub|bar|biergarten|cinema|theatre|arts_centre|marketplace)$"][name];' +
+        'nwr' + around + '[tourism~"^(museum|gallery|attraction|zoo)$"][name];' +
+        'nwr' + around + '[leisure~"^(park|garden|nature_reserve)$"][name];' +
+        'nwr' + around + '[shop~"^(supermarket|bakery|deli|greengrocer|cheese|books)$"][name];' +
+        ");out center 200;";
+      return fetch("https://overpass-api.de/api/interpreter", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "data=" + encodeURIComponent(query)
+      }).then(function(r){ if(!r.ok) throw new Error("net"); return r.json(); })
+        .then(function(data){ renderNearby(data, lat, lon); });
+    })
+    .catch(function(e){
+      nearbyMsg(e && e.message && e.message !== "net" ? e.message :
+        "Couldn't reach the map services — check you're online and try again in a minute.");
+    });
+}
+function haversineM(lat1, lon1, lat2, lon2){
+  var R = 6371000, toRad = Math.PI / 180;
+  var dLat = (lat2 - lat1) * toRad, dLon = (lon2 - lon1) * toRad;
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) * Math.sin(dLon/2) * Math.sin(dLon/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+function renderNearby(data, homeLat, homeLon){
+  var seen = {}, byCat = {};
+  (data.elements || []).forEach(function(e){
+    var tags = e.tags || {};
+    var name = tags.name;
+    if(!name) return;
+    var cat = osmCategory(tags);
+    if(!cat) return;
+    var key = name.toLowerCase();
+    if(seen[key]) return;
+    seen[key] = true;
+    var lat = e.lat != null ? e.lat : (e.center && e.center.lat);
+    var lon = e.lon != null ? e.lon : (e.center && e.center.lon);
+    var dist = (lat != null && lon != null) ? Math.round(haversineM(homeLat, homeLon, lat, lon) / 10) * 10 : null;
+    (byCat[cat] = byCat[cat] || []).push({ name: name, dist: dist });
+  });
+  var cats = TIP_CATS.filter(function(c){ return byCat[c] && byCat[c].length; });
+  if(!cats.length){
+    nearbyMsg("Nothing found nearby on OpenStreetMap — you can still add tips by hand below.");
+    return;
+  }
+  nearbyMsg("Tick your favourites, then add them as tips (you can write the \u201cwhy\u201d after):");
+  var box = el("nearbyResults");
+  box.innerHTML = "";
+  cats.forEach(function(cat){
+    var g = document.createElement("div");
+    g.className = "nearby-group";
+    var h = document.createElement("h5");
+    h.textContent = cat;
+    g.appendChild(h);
+    byCat[cat].sort(function(a, b){ return (a.dist || 9e9) - (b.dist || 9e9); })
+      .slice(0, 14)
+      .forEach(function(p){
+        var row = document.createElement("label");
+        row.className = "nearby-item";
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.dataset.name = p.name;
+        cb.dataset.cat = cat;
+        var span = document.createElement("span");
+        span.textContent = p.name;
+        var d = document.createElement("span");
+        d.className = "dist";
+        d.textContent = p.dist != null ? (p.dist < 1000 ? p.dist + " m" : (p.dist/1000).toFixed(1) + " km") : "";
+        row.appendChild(cb); row.appendChild(span); row.appendChild(d);
+        g.appendChild(row);
+      });
+    box.appendChild(g);
+  });
+  var actions = document.createElement("div");
+  actions.className = "nearby-actions";
+  var addBtn = document.createElement("button");
+  addBtn.className = "btn-primary";
+  addBtn.type = "button";
+  addBtn.textContent = "Add selected as tips";
+  addBtn.addEventListener("click", function(){
+    var town = val("f_town");
+    var checked = box.querySelectorAll("input[type=checkbox]:checked");
+    if(!checked.length){ nearbyMsg("Tick at least one place first."); return; }
+    checked.forEach(function(cb){
+      addTip({ cat: cb.dataset.cat, name: cb.dataset.name, why: "", query: cb.dataset.name + (town ? ", " + town : "") });
+    });
+    box.innerHTML = "";
+    nearbyMsg("Added " + checked.length + " — now add a line on why you love each one.");
+  });
+  var clearBtn = document.createElement("button");
+  clearBtn.className = "btn-quiet";
+  clearBtn.type = "button";
+  clearBtn.textContent = "Dismiss";
+  clearBtn.addEventListener("click", function(){ box.innerHTML = ""; nearbyMsg(""); });
+  actions.appendChild(addBtn);
+  actions.appendChild(clearBtn);
+  box.appendChild(actions);
+}
+
+/* ---------------- preview / outputs ---------------- */
+var refreshTimer = null;
+function refresh(){
+  clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(function(){
+    el("preview").srcdoc = buildGuide(collect());
+  }, 250);
+}
+function slug(s){
+  return (s || "house-guide").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"") || "house-guide";
+}
+function downloadBlob(text, name, type){
+  var blob = new Blob([text], {type: type});
+  if(blob.size > 4.5 * 1024 * 1024){
+    alert("Heads up: the guide is over 4.5 MB (mostly photos). It'll still work, but consider removing a photo or two if it's slow to open or email.");
+  }
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+}
+function downloadGuide(){
+  var s = collect();
+  downloadBlob(buildGuide(s), "guide-" + slug(s.address ? s.address.split(",")[0] : s.town) + ".html", "text/html");
+}
+function printSrcdoc(html){
+  var frame = el("preview");
+  var wasMobileHidden = window.matchMedia("(max-width: 980px)").matches && !el("previewPane").classList.contains("mobile-show");
+  frame.onload = function(){
+    frame.onload = null;
+    setTimeout(function(){
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+      setTimeout(refresh, 600);
+    }, 150);
+  };
+  if(wasMobileHidden) togglePreview(true);
+  frame.srcdoc = html;
+}
+function printGuide(){ printSrcdoc(buildGuide(collect())); }
+function printFridgeCard(){ printSrcdoc(buildFridgeCard(collect())); }
+
+/* ---------------- save / load progress ---------------- */
+function saveProgress(){
+  downloadBlob(JSON.stringify(collect(), null, 2), "house-notes-progress.json", "application/json");
+}
+function loadFromInput(evt){
+  var file = evt.target.files[0];
+  if(file) loadFile(file);
+  evt.target.value = "";
+}
+function loadFile(file){
+  var reader = new FileReader();
+  reader.onload = function(){
+    var text = reader.result;
+    try{
+      var data;
+      if(/^\s*[{\[]/.test(text)){
+        data = JSON.parse(text);
+      } else {
+        var m = text.match(/<script type="application\/json" id="house-notes-data">([\s\S]*?)<\/script>/);
+        if(!m) throw new Error("no-data");
+        data = JSON.parse(m[1]);
+      }
+      applyState(data);
+    }catch(e){
+      alert("That file couldn't be read. Load either a house-notes-progress.json file or a guide HTML downloaded from this app.");
+    }
+  };
+  reader.readAsText(file);
+}
+function clearRows(){
+  ["petList","tipList","contactList","customList"].forEach(function(id){ el(id).innerHTML = ""; });
+}
+function applyState(s){
+  s = s || {};
+  var map = {f_hosts:"hosts", f_guest:"guest", f_address:"address", f_town:"town", f_dates:"dates",
+    f_reach:"reach", f_welcome:"welcome", f_keys:"keys", f_alarm:"alarm", f_wifiname:"wifiname",
+    f_wifipass:"wifipass", f_heating:"heating", f_appliances:"appliances", f_bins:"bins",
+    f_plants:"plants", f_quirks:"quirks", f_other:"other"};
+  Object.keys(map).forEach(function(id){ el(id).value = s[map[id]] || ""; });
+  var ph = s.photos || {};
+  photoStore.keys = (ph.keys || []).slice();
+  photoStore.essentials = (ph.essentials || []).slice();
+  photoStore.house = (ph.house || []).slice();
+  initFixedPhotoBlocks();
+  clearRows();
+  (s.pets || []).forEach(addPet);
+  (s.tips || []).forEach(addTip);
+  (s.contacts || []).forEach(addContact);
+  (s.custom || []).forEach(addCustom);
+  refresh();
+}
+
+/* ---------------- new stay ---------------- */
+function newStay(){
+  if(!confirm("Start a new stay? This keeps all the house details, pets, tips and contacts, and clears just the guest name, dates and welcome note.")) return;
+  el("f_guest").value = "";
+  el("f_dates").value = "";
+  el("f_welcome").value = "";
+  el("f_guest").focus();
+  refresh();
+}
+
+/* ---------------- example ---------------- */
+function loadExample(){
+  applyState({
+    hosts: "Sam & Alex", guest: "Robin",
+    address: "Hooigracht 42, Leiden", town: "Leiden",
+    dates: "12–26 August",
+    reach: "WhatsApp works everywhere we'll be: +31 6 12 34 56 78. No question is too small!",
+    welcome: "So glad you're staying! Please treat the place completely as your own — eat whatever's in the fridge, drink the wine on the rack, use the good coffee beans. The house is old and creaky and full of character; nothing that groans is actually a problem.\n\nMostly: relax, enjoy the city, and give Mabel a scratch from us.",
+    keys: "The silver key is the front door — pull the door towards you while turning, it's stiff. The small round key opens the bike shed in the courtyard (help yourself to the grey bike, lights in the basket).",
+    alarm: "No alarm. Hallway light switch hides behind the coat rack, everyone misses it.",
+    wifiname: "Hooigracht42", wifipass: "tulip-canal-42!",
+    heating: "Thermostat in the hall runs on a schedule — nudge it up if you're cold, it resets itself. Hot water is instant but the shower tap is sensitive: tiny movements.",
+    appliances: "Induction hob wants the pan dead-centre. Dishwasher tablets under the sink; it beeps three times when done. TV: press the round button on the remote twice, then it behaves.",
+    bins: "Green (organic) bin out Monday evening, grey bin alternate Thursdays. They live by the side gate — the neighbours put theirs out first, so just follow the crowd. Glass goes to the container on the corner whenever.",
+    plants: "The big monstera in the living room gets a glass of water on Sundays. Balcony plants are drought-hardened veterans; ignore them.",
+    quirks: "The bathroom tap squeaks — fine. The fridge hums dramatically at night; a gentle shove silences it. The third stair creaks. It has always creaked.",
+    other: "Spare bedding in the landing cupboard, spare towels bottom shelf of the bathroom cabinet. Washing machine is simple — programme 3 does everything.",
+    pets: [{
+      name: "Mabel — elderly tabby cat",
+      food: "Half a pouch morning and evening (cupboard left of the fridge). Keep the dry-food bowl topped up. She will claim she has never been fed. She lies.",
+      routine: "Litter tray in the utility room — scoop daily if you can, fresh litter under the sink. She goes out via the cat flap and always comes back by dinner.",
+      personality: "Aloof for the first day, then she'll sleep on your feet. Hides under the bed during thunderstorms — leave her be and she'll reappear.",
+      vet: "Dierenkliniek Centrum, 071 123 4567 (5 min walk). She's healthy; if she skips two meals in a row, message us."
+    }],
+    tips: [
+      {cat:"Eat", name:"Restaurant In den Doofpot", why:"Our special-occasion place — book ahead, get the tasting menu."},
+      {cat:"Eat", name:"Persepolis Leiden", why:"Brilliant Persian food, huge portions, very relaxed."},
+      {cat:"Drink", name:"Café de Bonte Koe", why:"Classic brown café. Local beer, window seat, watch the world go by."},
+      {cat:"Coffee & cake", name:"Anne&Max Leiden", why:"Best flat white in town and dangerous apple pie."},
+      {cat:"Fun & culture", name:"Rijksmuseum Boerhaave", why:"Science museum, weirder and better than it sounds. An hour well spent on a rainy day."},
+      {cat:"Walks & nature", name:"Hortus botanicus Leiden", why:"One of the oldest botanical gardens in the world. Quiet, gorgeous, cheap entry."},
+      {cat:"Shops & practical", name:"Zaterdagmarkt (Saturday market)", why:"Along the Nieuwe Rijn every Saturday — cheese, fish, flowers, stroopwafels made in front of you."}
+    ],
+    contacts: [
+      {who:"Marijke next door (no. 40)", num:"06 1234 5678", note:"Has a spare key and knows the house better than we do"},
+      {who:"Vet — Dierenkliniek Centrum", num:"071 123 4567", note:"For anything Mabel-related"},
+      {who:"Huisarts (GP practice)", num:"071 765 4321", note:"If you need a doctor — mention you're staying at our address"}
+    ],
+    custom: [
+      {title:"The record player", body:"Please use it! Amp on first, then the deck. Records are roughly alphabetical; the good stuff is on the left."}
+    ]
+  });
+  document.querySelectorAll("details.section").forEach(function(d){ d.open = true; });
+}
+
+/* ---------------- mobile preview ---------------- */
+function togglePreview(show){
+  el("previewPane").classList.toggle("mobile-show", show);
+  if(show) refresh();
+}
+
+/* ---------------- drag & drop loading ---------------- */
+var dragDepth = 0;
+document.addEventListener("dragenter", function(e){
+  if(e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, "Files") !== -1){
+    dragDepth++;
+    document.body.classList.add("dragging");
+  }
+});
+document.addEventListener("dragleave", function(){
+  dragDepth = Math.max(0, dragDepth - 1);
+  if(!dragDepth) document.body.classList.remove("dragging");
+});
+document.addEventListener("dragover", function(e){ e.preventDefault(); });
+document.addEventListener("drop", function(e){
+  e.preventDefault();
+  dragDepth = 0;
+  document.body.classList.remove("dragging");
+  var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(f) loadFile(f);
+});
+
+/* ---------------- wire up ---------------- */
+document.querySelectorAll("input, textarea").forEach(function(i){
+  i.addEventListener("input", refresh);
+});
+initFixedPhotoBlocks();
+refresh();
+</script>
+</body>
+</html>
