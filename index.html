@@ -237,6 +237,8 @@
 
 /* ---- app shell (Phase 1) ---- */
 body{background:var(--canvas)}
+/* hidden must win over the display:flex on the view containers below */
+[hidden]{display:none !important}
 .screen{max-width:900px;margin:0 auto;padding:40px 20px}
 /* auth */
 #view-auth{display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
@@ -292,6 +294,16 @@ body{background:var(--canvas)}
 .editor-intro{background:var(--lime-soft);border:1px solid #DCEEB5;border-radius:14px;padding:14px 16px;margin-bottom:14px;font-size:14px;color:#3A4A38}
 .mob-preview{display:inline-block}
 @media (min-width:1040px){.mob-preview{display:none}}
+/* mobile polish: keep the editor bar tidy on a phone */
+@media (max-width:600px){
+  .appbar{padding:8px 12px;gap:8px}
+  .appbar .back{font-size:14px;padding:0 2px}
+  .save-status{min-width:0;font-size:12px}
+  .appbar .btno.mob-preview{padding:8px 12px;min-height:38px}
+  .appbar .btnp{padding:8px 14px;min-height:38px}
+  .dash-top .email{display:none}
+  .screen{padding:26px 16px}
+}
 
 </style>
 </head>
@@ -456,9 +468,9 @@ body{background:var(--canvas)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-     window.SUPABASE_URL = "https://gkejutshckcezynqofgj.supabase.co";
-     window.SUPABASE_ANON_KEY = "sb_publishable_5Xj5sw1Qqed3iaI79J6KLA_fbsdYBVR";
-   </script>
+  window.SUPABASE_URL = "https://gkejutshckcezynqofgj.supabase.co";
+  window.SUPABASE_ANON_KEY = "sb_publishable_5Xj5sw1Qqed3iaI79J6KLA_fbsdYBVR";
+</script>
 <script>
 /* qrcode-generator (c) Kazuhiko Arase, MIT */
 /* Bricolage Grotesque, SIL OFL 1.1 */
