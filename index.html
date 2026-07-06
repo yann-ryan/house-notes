@@ -294,6 +294,44 @@ body{background:var(--canvas)}
 .editor-intro{background:var(--lime-soft);border:1px solid #DCEEB5;border-radius:14px;padding:14px 16px;margin-bottom:14px;font-size:14px;color:#3A4A38}
 .mob-preview{display:inline-block}
 @media (min-width:1040px){.mob-preview{display:none}}
+
+/* ---- stays / guest links panel ---- */
+.overlay{position:fixed;inset:0;z-index:80;background:rgba(22,19,15,.45);display:flex;align-items:flex-end;justify-content:center}
+@media (min-width:720px){.overlay{align-items:center}}
+.sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;
+  box-shadow:0 -10px 40px rgba(22,19,15,.3)}
+@media (min-width:720px){.sheet{border-radius:14px}}
+.sheet-head{position:sticky;top:0;background:var(--card);display:flex;align-items:center;padding:16px 18px;border-bottom:2px solid var(--ink)}
+.sheet-head h2{font-family:var(--display);font-weight:700;font-size:19px;margin:0}
+.icon-x{margin-left:auto;background:transparent;border:none;font-size:18px;color:var(--muted);cursor:pointer;min-height:40px;min-width:40px}
+.sheet-body{padding:16px 18px 26px}
+.stay-new .field{margin-bottom:12px}
+.stay-new label{display:block;font-size:12.5px;font-weight:600;color:#454F49;margin-bottom:5px}
+.stay-new input{width:100%;font-size:16px;min-height:48px;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:var(--field)}
+.stay-new input:focus{outline:none;border-color:var(--pine);box-shadow:0 0 0 3px rgba(40,70,143,.18)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+#stay-create{width:100%;background:var(--pine);color:#fff;border:none;border-radius:999px;font-weight:600;min-height:48px;font-size:15px;cursor:pointer;margin-top:4px}
+.stay-result{margin-top:14px;background:var(--lime-soft);border:1px solid #DCEEB5;border-radius:12px;padding:14px 16px}
+.stay-result .lk{font-family:var(--mono);font-size:12.5px;word-break:break-all;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0}
+.stay-result .qr{display:flex;justify-content:center;margin:10px 0}
+.stay-result .qr svg{width:150px;height:150px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px}
+.stay-result .btnrow{display:flex;gap:8px;flex-wrap:wrap}
+.mini{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 13px;font-weight:600;font-size:13px;cursor:pointer;min-height:38px;color:var(--ink)}
+.mini.warn{color:var(--red);border-color:#E5CFC8}
+.stays-h{font-family:var(--display);font-weight:700;font-size:15px;margin:22px 0 8px}
+#stays-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+#stays-list .hint{color:var(--muted);font-size:13.5px}
+.stay-row{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stay-row.revoked{opacity:.6}
+.stay-row .top{display:flex;align-items:baseline;gap:8px}
+.stay-row .g{font-family:var(--display);font-weight:600}
+.stay-row .st{margin-left:auto;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stay-row .st.active{color:var(--pine)}
+.stay-row .st.off{color:var(--red)}
+.stay-row .when{font-size:12.5px;color:var(--muted);margin:3px 0 10px}
+.stay-row .btnrow{display:flex;gap:7px;flex-wrap:wrap}
+.stale-tag{display:inline-block;font-size:11px;color:var(--red);margin-top:6px}
+
 /* mobile polish: keep the editor bar tidy on a phone */
 @media (max-width:600px){
   .appbar{padding:8px 12px;gap:8px}
@@ -345,11 +383,12 @@ body{background:var(--canvas)}
     <span class="spacer"></span>
     <span class="save-status" id="save-status"></span>
     <button class="btno mob-preview" id="toggle-preview" type="button">Preview</button>
-    <button class="btnp" id="export-guide" type="button">Export / share</button>
+    <button class="btnp" id="open-stays" type="button">Guests</button>
+    <button class="btno" id="export-guide" type="button">Export file</button>
   </div>
   <div class="editor-grid">
     <div id="editor-form">
-      <p class="editor-intro">Everything autosaves as you type. When you're ready, <strong>Export / share</strong> downloads the single-file guide (lockable with a guest code) that you send or host.</p>
+      <p class="editor-intro">Everything autosaves as you type. When you're ready, use <strong>Guests</strong> to create a private link + code for someone, or <strong>Export file</strong> for the single-file offline guide.</p>
       <details class="section" open>
       <summary><span class="sec-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/></svg></span><span class="sec-title">The basics</span><span class="sec-hint">who, where, when</span><span class="chev"></span></summary>
       <div class="sec-body">
@@ -463,6 +502,30 @@ body{background:var(--canvas)}
     </details>
     </div>
     <div id="previewPane"><iframe id="preview" title="Guide preview"></iframe></div>
+  </div>
+
+  <div class="overlay" id="stays-panel" hidden>
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2>Guest links</h2>
+        <button class="icon-x" id="stays-close" aria-label="Close">&#10005;</button>
+      </div>
+      <div class="sheet-body">
+        <div class="stay-new">
+          <div class="field"><label for="stay-guest">Guest name <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="stay-guest" type="text" placeholder="Robin" autocomplete="off"></div>
+          <div class="field"><label for="stay-code">Access code</label><input id="stay-code" type="text" placeholder="e.g. blue-door" autocomplete="off"></div>
+          <div class="row2">
+            <div class="field"><label for="stay-start">From <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="stay-start" type="date"></div>
+            <div class="field"><label for="stay-end">Until <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="stay-end" type="date"></div>
+          </div>
+          <button class="btnp" id="stay-create" type="button">Create guest link</button>
+          <p class="hint">The guide is snapshotted and encrypted with this code, then uploaded. Share the link and the code with your guest separately — the server never sees the code.</p>
+          <div class="stay-result" id="stay-result" hidden></div>
+        </div>
+        <h3 class="stays-h">Existing links</h3>
+        <ul id="stays-list"></ul>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1290,7 +1353,8 @@ var refreshTimer = null;
 function refresh(){
   clearTimeout(refreshTimer);
   refreshTimer = setTimeout(function(){
-    el("preview").srcdoc = buildGuide(collect());
+    var f = el("preview");
+    if(f) f.srcdoc = buildGuide(collect());
   }, 250);
 }
 function slug(s){
@@ -1786,6 +1850,109 @@ refresh();
   };
 })();
 
+/* ============================================================================
+ * Phase 2 — stays (guest access). Appended to window.hnDB.
+ * The guide is encrypted in the browser with the guest code before upload;
+ * the server stores only ciphertext and gates access via get_stay().
+ * ==========================================================================*/
+(function () {
+  "use strict";
+  var DB = window.hnDB;
+  if (!DB) return;
+
+  function client() {
+    var c = window.__supabaseClientOverride ||
+      (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY
+        ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null);
+    if (!c) throw new Error("Supabase not configured.");
+    return c;
+  }
+  function randomSlug(n) {
+    n = n || 12;
+    var alphabet = "abcdefghijkmnpqrstuvwxyz23456789"; // no look-alikes
+    var bytes = crypto.getRandomValues(new Uint8Array(n)), s = "";
+    for (var i = 0; i < n; i++) s += alphabet[bytes[i] % alphabet.length];
+    return s;
+  }
+
+  // Snapshot the current guide (full self-contained HTML state) and encrypt it.
+  // `guideState` is the object from collect(); `code` is the guest's code.
+  async function encryptSnapshot(guideState, code) {
+    if (typeof hnEncrypt !== "function") throw new Error("Encryption unavailable (open over https).");
+    var json = JSON.stringify(guideState);
+    return JSON.parse(await hnEncrypt(json, code)); // store as jsonb
+  }
+
+  async function listStays(houseId) {
+    var { data, error } = await client()
+      .from("stays")
+      .select("id,guest_name,slug,starts_at,ends_at,revoked,created_at,updated_at")
+      .eq("house_id", houseId)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
+  }
+  async function createStay(houseId, opts) {
+    // opts: { guestName, code, guideState, startsAt, endsAt }
+    var cipher = await encryptSnapshot(opts.guideState, opts.code);
+    var slug = randomSlug(12);
+    var row = {
+      house_id: houseId, guest_name: opts.guestName || null, slug: slug, cipher: cipher,
+      starts_at: opts.startsAt || null, ends_at: opts.endsAt || null
+    };
+    var { data, error } = await client().from("stays").insert(row)
+      .select("id,guest_name,slug,starts_at,ends_at,revoked").single();
+    if (error) {
+      // extremely unlikely slug collision: retry once
+      if (String(error.message || "").match(/duplicate|unique/i)) {
+        row.slug = randomSlug(14);
+        var r2 = await client().from("stays").insert(row).select("id,guest_name,slug,starts_at,ends_at,revoked").single();
+        if (r2.error) throw r2.error;
+        return r2.data;
+      }
+      throw error;
+    }
+    return data;
+  }
+  async function republishStay(stayId, guideState, code) {
+    var cipher = await encryptSnapshot(guideState, code);
+    var { error } = await client().from("stays").update({ cipher: cipher }).eq("id", stayId);
+    if (error) throw error;
+  }
+  async function setStayRevoked(stayId, revoked) {
+    var { error } = await client().from("stays").update({ revoked: !!revoked }).eq("id", stayId);
+    if (error) throw error;
+  }
+  async function deleteStay(stayId) {
+    var { error } = await client().from("stays").delete().eq("id", stayId);
+    if (error) throw error;
+  }
+  // Guest side: fetch an active stay's ciphertext by slug (via the gated RPC).
+  async function getStayPublic(slug) {
+    var { data, error } = await client().rpc("get_stay", { p_slug: slug });
+    if (error) throw error;
+    // returns an array (0 or 1 rows)
+    return (data && data.length) ? data[0] : null;
+  }
+
+  // Build the shareable guest link for a slug (guest.html alongside the app).
+  function guestUrl(slug) {
+    var base = window.location.href.split("#")[0].replace(/[^/]*$/, ""); // dir of current page
+    return base + "guest.html#" + slug;
+  }
+
+  Object.assign(DB, {
+    listStays: listStays,
+    createStay: createStay,
+    republishStay: republishStay,
+    setStayRevoked: setStayRevoked,
+    deleteStay: deleteStay,
+    getStayPublic: getStayPublic,
+    guestUrl: guestUrl,
+    randomSlug: randomSlug
+  });
+})();
+
 </script>
 <script>
 /* ============================================================================
@@ -1927,6 +2094,7 @@ refresh();
 
   async function openEditor(houseId) {
     show("editor");
+    window.hnCurrentHouseId = houseId;
     setStatus("saving"); // loading
     try {
       var content = await DB.loadGuide(houseId);
@@ -1986,6 +2154,116 @@ refresh();
   if (document.readyState === "loading")
     document.addEventListener("DOMContentLoaded", boot);
   else boot();
+})();
+
+/* ============================================================================
+ * Phase 2 — Guests panel (create/list/revoke/republish guest links)
+ * ==========================================================================*/
+(function () {
+  "use strict";
+  var DB = window.hnDB;
+  function $(id){ return document.getElementById(id); }
+  function houseId(){ return window.hnCurrentHouseId; }
+
+  function qrSvg(text){
+    try{ var q=qrcode(0,"M"); q.addData(text); q.make();
+      return q.createSvgTag({cellSize:4,margin:1,scalable:true}); }catch(e){ return ""; }
+  }
+  function dateToStartISO(v){ return v ? new Date(v+"T00:00:00").toISOString() : null; }
+  function dateToEndISO(v){ return v ? new Date(v+"T23:59:59").toISOString() : null; }
+  function fmt(d){ try{ return new Date(d).toLocaleDateString(); }catch(e){ return ""; } }
+  function statusOf(s){
+    if(s.revoked) return {cls:"off",label:"revoked"};
+    var now=Date.now();
+    if(s.starts_at && new Date(s.starts_at).getTime()>now) return {cls:"",label:"starts "+fmt(s.starts_at)};
+    if(s.ends_at && new Date(s.ends_at).getTime()<now) return {cls:"off",label:"expired"};
+    return {cls:"active",label:"active"};
+  }
+
+  function open(){
+    var p=$("stays-panel"); if(!p) return;
+    p.hidden=false;
+    $("stay-guest").value=""; $("stay-code").value="";
+    $("stay-start").value=""; $("stay-end").value="";
+    $("stay-result").hidden=true; $("stay-result").innerHTML="";
+    refreshList();
+  }
+  function close(){ var p=$("stays-panel"); if(p) p.hidden=true; }
+
+  async function refreshList(){
+    var list=$("stays-list");
+    list.innerHTML="<li class='hint'>Loading…</li>";
+    try{
+      var stays=await DB.listStays(houseId());
+      if(!stays.length){ list.innerHTML="<li class='hint'>No guest links yet.</li>"; return; }
+      list.innerHTML="";
+      stays.forEach(function(s){
+        var st=statusOf(s), url=DB.guestUrl(s.slug);
+        var li=document.createElement("li");
+        li.className="stay-row"+(s.revoked?" revoked":"");
+        var when=[s.starts_at?("from "+fmt(s.starts_at)):"", s.ends_at?("until "+fmt(s.ends_at)):""].filter(Boolean).join(" · ")||"no date limit";
+        li.innerHTML=
+          "<div class='top'><span class='g'></span><span class='st "+st.cls+"'>"+st.label+"</span></div>"+
+          "<div class='when'></div>"+
+          "<div class='btnrow'></div>";
+        li.querySelector(".g").textContent=s.guest_name||"Guest";
+        li.querySelector(".when").textContent=when;
+        var row=li.querySelector(".btnrow");
+        function mk(label,cls,fn){ var b=document.createElement("button"); b.className="mini"+(cls?" "+cls:""); b.textContent=label; b.addEventListener("click",fn); row.appendChild(b); return b; }
+        mk("Copy link","",function(){ navigator.clipboard.writeText(url).then(function(){},function(){}); this.textContent="Copied ✓"; var b=this; setTimeout(function(){b.textContent="Copy link";},1200); });
+        mk("QR","",function(){ showResult(s, url); });
+        mk(s.revoked?"Restore":"Revoke", s.revoked?"":"warn", async function(){ await DB.setStayRevoked(s.id,!s.revoked); refreshList(); });
+        mk("Update guide","",async function(){
+          var code=prompt("Re-enter this guest's code to update their copy of the guide:");
+          if(code==null) return;
+          try{ await DB.republishStay(s.id, collect(), code.trim()); this.textContent="Updated ✓"; }
+          catch(e){ alert("Couldn't update: "+(e.message||e)); }
+        });
+        mk("Delete","warn",async function(){ if(!confirm("Delete this guest link? The link will stop working.")) return; await DB.deleteStay(s.id); refreshList(); });
+        list.appendChild(li);
+      });
+    }catch(e){ list.innerHTML="<li class='hint'>Couldn't load links: "+(e.message||e)+"</li>"; }
+  }
+
+  function showResult(stay, url){
+    var box=$("stay-result"); box.hidden=false;
+    box.innerHTML=
+      "<strong>Share this with "+(stay.guest_name?escapeHtml(stay.guest_name):"your guest")+":</strong>"+
+      "<div class='lk'></div>"+
+      "<div class='qr'>"+qrSvg(url)+"</div>"+
+      "<div class='btnrow'><button class='mini' id='sr-copy'>Copy link</button></div>"+
+      "<p class='hint'>Then tell them the code separately. They open the link, type the code, and see the guide.</p>";
+    box.querySelector(".lk").textContent=url;
+    var c=$("sr-copy"); if(c) c.addEventListener("click",function(){ navigator.clipboard.writeText(url).then(function(){},function(){}); c.textContent="Copied ✓"; });
+    box.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m];}); }
+
+  async function create(){
+    var code=($("stay-code").value||"").trim();
+    if(!code){ $("stay-code").focus(); return; }
+    var btn=$("stay-create"); btn.disabled=true; var old=btn.textContent; btn.textContent="Creating…";
+    try{
+      var stay=await DB.createStay(houseId(), {
+        guestName: ($("stay-guest").value||"").trim(),
+        code: code,
+        guideState: collect(),
+        startsAt: dateToStartISO($("stay-start").value),
+        endsAt: dateToEndISO($("stay-end").value)
+      });
+      showResult(stay, DB.guestUrl(stay.slug));
+      refreshList();
+    }catch(e){ alert("Couldn't create the link: "+(e.message||e)); }
+    finally{ btn.disabled=false; btn.textContent=old; }
+  }
+
+  function boot(){
+    var openBtn=$("open-stays"); if(openBtn) openBtn.addEventListener("click",open);
+    var closeBtn=$("stays-close"); if(closeBtn) closeBtn.addEventListener("click",close);
+    var panel=$("stays-panel"); if(panel) panel.addEventListener("click",function(e){ if(e.target===panel) close(); });
+    var createBtn=$("stay-create"); if(createBtn) createBtn.addEventListener("click",create);
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot); else boot();
 })();
 
 </script>
